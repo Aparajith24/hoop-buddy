@@ -10,6 +10,23 @@ interface LoadingStepProps {
 }
 
 export function LoadingStep({ loadingMessage, position, level }: LoadingStepProps) {
+  function positionName(position: string) {
+    if (position === "pointGuard") return "Point Guard"
+    if (position === "shootingGuard") return "Shooting Guard"
+    if (position === "smallForward") return "Small Forward"
+    if (position === "powerForward") return "Power Forward"
+    if (position === "center") return "Center"
+  }
+
+  function levelName(level: string) {
+    if (level === "recreational") return "Recreational"
+    if (level === "school") return "School"
+    if (level === "highSchool") return "High School"
+    if (level === "college") return "College"
+    if (level === "semiPro") return "Semi-Pro"
+    if (level === "professional") return "Professional"
+  }
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -42,8 +59,8 @@ export function LoadingStep({ loadingMessage, position, level }: LoadingStepProp
         <div className="mt-8 max-w-md mx-auto bg-orange-50/80 dark:bg-orange-950/20 p-4 rounded-lg border border-orange-200 dark:border-orange-900/30">
           <p className="text-muted-foreground">
             Our AI coach is analyzing your profile and designing personalized exercises 
-            tailored to your position as a <span className="text-orange-600 dark:text-orange-400 font-medium">{position || "player"}</span>, 
-            at <span className="text-orange-600 dark:text-orange-400 font-medium">{level || "your"}</span> level,
+            tailored to your position as a <span className="text-orange-600 dark:text-orange-400 font-medium">{positionName(position)}</span>, 
+            at <span className="text-orange-600 dark:text-orange-400 font-medium">{levelName(level)}</span> level,
             focusing on the areas you want to improve.
           </p>
         </div>

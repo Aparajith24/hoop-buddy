@@ -1,42 +1,48 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Calendar, Clock, Dumbbell, User } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar, Clock, Dumbbell, User } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface Exercise {
-  name: string
-  duration: string
-  description: string
+  name: string;
+  duration: string;
+  description: string;
 }
 
 interface DaySchedule {
-  day: string
-  hours: number
-  timeOfDay: string[]
-  exercises: Exercise[]
+  day: string;
+  hours: number;
+  timeOfDay: string[];
+  exercises: Exercise[];
 }
 
 interface WorkoutPlanType {
-  name: string
-  age: string | number
-  position: string
-  level: string
-  focusAreas: string
-  workoutSchedule: DaySchedule[]
+  name: string;
+  age: string | number;
+  position: string;
+  level: string;
+  focusAreas: string;
+  workoutSchedule: DaySchedule[];
 }
 
 export function WorkoutPlan({ plan }: { plan: WorkoutPlanType }) {
-  const [selectedDay, setSelectedDay] = useState(plan.workoutSchedule.length > 0 ? plan.workoutSchedule[0].day : "")
+  const [selectedDay, setSelectedDay] = useState(
+    plan.workoutSchedule.length > 0 ? plan.workoutSchedule[0].day : ""
+  );
 
   const getDaySchedule = () => {
-    return plan.workoutSchedule.find((schedule: DaySchedule) => schedule.day === selectedDay) || {}
-  }
+    return (
+      plan.workoutSchedule.find(
+        (schedule: DaySchedule) => schedule.day === selectedDay
+      ) || {}
+    );
+  };
 
-  const daySchedule = getDaySchedule() as DaySchedule
+  const daySchedule = getDaySchedule() as DaySchedule;
 
   return (
     <div className="space-y-6">
@@ -57,13 +63,28 @@ export function WorkoutPlan({ plan }: { plan: WorkoutPlanType }) {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
-              {plan.position}
+            <Badge
+              variant="outline"
+              className="bg-orange-50 text-orange-700 border-orange-200"
+            >
+              {plan.position === "pointGuard" ? "Point Guard"
+                  : plan.position === "shootingGuard" ? "Shooting Guard"
+                  : plan.position === "smallForward" ? "Small Forward"
+                  : plan.position === "powerForward" ? "Power Forward"
+                  : "Center"}
             </Badge>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="bg-black text-white border-black">
-              {plan.level}
+            <Badge
+              variant="outline"
+              className="bg-black text-white border-black"
+            >
+              {plan.level == "recreational" ? "Recreational"
+                : plan.level == "school" ? "School"
+                : plan.level == "highSchool" ? "High School"
+                : plan.level == "college" ? "College"
+                : plan.level == "semiPro" ? "Semi-Pro"
+                : "Professional"}
             </Badge>
           </div>
         </div>
@@ -78,7 +99,11 @@ export function WorkoutPlan({ plan }: { plan: WorkoutPlanType }) {
 
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Weekly Schedule:</h3>
-        <Tabs value={selectedDay} onValueChange={setSelectedDay} className="w-full">
+        <Tabs
+          value={selectedDay}
+          onValueChange={setSelectedDay}
+          className="w-full"
+        >
           <TabsList className="w-full justify-start overflow-auto py-2 h-auto flex-wrap">
             {plan.workoutSchedule.map((schedule: DaySchedule) => (
               <TabsTrigger
@@ -99,43 +124,61 @@ export function WorkoutPlan({ plan }: { plan: WorkoutPlanType }) {
                     {daySchedule.hours} hours
                   </Badge>
                   {daySchedule.timeOfDay?.map((time: string) => (
-                    <Badge key={time} variant="outline" className="bg-white dark:bg-black/20">
-                      {time} {time === "Morning" ? "🌅" : time === "Afternoon" ? "☀️" : "🌙"}
+                    <Badge
+                      key={time}
+                      variant="outline"
+                      className="bg-white dark:bg-black/20"
+                    >
+                      {time}{" "}
+                      {time === "Morning"
+                        ? "🌅"
+                        : time === "Afternoon"
+                          ? "☀️"
+                          : "🌙"}
                     </Badge>
                   ))}
                 </div>
 
                 <div className="grid gap-4">
-                  {daySchedule.exercises.map((exercise: Exercise, index: number) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                    >
-                      <Card className="overflow-hidden border-orange-100 dark:border-orange-900/50">
-                        <div className="h-2 bg-gradient-to-r from-orange-400 to-orange-600" />
-                        <CardHeader className="pb-2">
-                          <div className="flex justify-between items-center">
-                            <CardTitle className="text-lg flex items-center gap-2">
-                              <Dumbbell className="h-5 w-5 text-orange-500" />
-                              {exercise.name}
-                            </CardTitle>
-                            <Badge variant="outline" className="bg-black dark:bg-white text-white dark:text-black">
-                              {exercise.duration}
-                            </Badge>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-muted-foreground">{exercise.description}</p>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
+                  {daySchedule.exercises.map(
+                    (exercise: Exercise, index: number) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <Card className="overflow-hidden border-orange-100 dark:border-orange-900/50">
+                          <div className="h-2 bg-gradient-to-r from-orange-400 to-orange-600" />
+                          <CardHeader className="pb-2">
+                            <div className="flex justify-between items-center">
+                              <CardTitle className="text-lg flex items-center gap-2">
+                                <Dumbbell className="h-5 w-5 text-orange-500" />
+                                {exercise.name}
+                              </CardTitle>
+                              <Badge
+                                variant="outline"
+                                className="bg-black dark:bg-white text-white dark:text-black"
+                              >
+                                {exercise.duration}
+                              </Badge>
+                            </div>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-muted-foreground">
+                              {exercise.description}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    )
+                  )}
                 </div>
               </div>
             ) : (
-              <div className="text-center p-8 text-muted-foreground">No exercises scheduled for this day.</div>
+              <div className="text-center p-8 text-muted-foreground">
+                No exercises scheduled for this day.
+              </div>
             )}
           </TabsContent>
         </Tabs>
@@ -147,13 +190,12 @@ export function WorkoutPlan({ plan }: { plan: WorkoutPlanType }) {
           <div>
             <h3 className="font-medium">Workout Summary</h3>
             <p className="text-sm text-muted-foreground">
-              Your plan includes workouts on {plan.workoutSchedule.length} days per week, focusing on improving your
-              skills as a {plan.position}.
+              Your plan includes workouts on {plan.workoutSchedule.length} days
+              per week, focusing on improving your skills as a {plan.position}.
             </p>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
-

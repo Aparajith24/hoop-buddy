@@ -28,15 +28,11 @@ interface WorkoutPlanType {
 interface ResultStepProps {
   workoutPlan: WorkoutPlanType
   workoutPlanRef: RefObject<HTMLDivElement | null>
-  isGeneratingPDF: boolean
-  onGeneratePDF: () => void
 }
 
 export function ResultStep({ 
   workoutPlan, 
   workoutPlanRef, 
-  isGeneratingPDF, 
-  onGeneratePDF 
 }: ResultStepProps) {
   return (
     <motion.div
@@ -59,21 +55,9 @@ export function ResultStep({
           <WorkoutPlan plan={workoutPlan} />
         </div>
       </CardContent>
-      <CardFooter className="flex justify-center">
-        <Button 
-          className="bg-orange-500 hover:bg-orange-600"
-          onClick={onGeneratePDF}
-          disabled={isGeneratingPDF}
-        >
-          {isGeneratingPDF ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating PDF...
-            </>
-          ) : (
-            <>
-              <Download className="mr-2 h-4 w-4" /> Download PDF
-            </>
-          )}
+      <CardFooter className="flex justify-center space-x-2">
+        <Button className="bg-orange-500 hover:bg-orange-600" onClick={() => window.location.reload()}>
+          Restart Form
         </Button>
       </CardFooter>
     </motion.div>

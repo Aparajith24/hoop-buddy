@@ -5,8 +5,6 @@ import { AnimatePresence, motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardFooter } from "@/components/ui/card"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import jsPDF from "jspdf"
-import html2canvas from "html2canvas"
 import { FormData, WorkoutPlanType } from "./types"
 import {
   PersonalInfoStep,
@@ -100,63 +98,10 @@ export function HoopBuddyForm() {
     }
   }
 
-  const generatePDF = async () => {
-    if (!workoutPlanRef.current || !workoutPlan) return
-    
-    try {
-      setIsGeneratingPDF(true)
-      const element = workoutPlanRef.current
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        logging: false,
-        useCORS: true,
-        allowTaint: true
-      })
-      
-      const imgData = canvas.toDataURL('image/png')
-      
-      // Initialize PDF
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      })
-      
-      const imgWidth = 210 // A4 width in mm
-      const pageHeight = 297 // A4 height in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width
-      
-      let heightLeft = imgHeight
-      let position = 0
-      
-      // Add first page
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
-      heightLeft -= pageHeight
-      
-      // Add subsequent pages if needed
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight
-        pdf.addPage()
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
-        heightLeft -= pageHeight
-      }
-      
-      // Create a filename with the person's name
-      const fileName = `${workoutPlan.name.replace(/\s+/g, '_')}_basketball_workout_plan.pdf`
-      pdf.save(fileName)
-      
-    } catch (err) {
-      console.error('Error generating PDF:', err)
-    } finally {
-      setIsGeneratingPDF(false)
-    }
-  }
 
   const generateWorkoutPlan = async () => {
     setIsLoading(true)
     setError(null)
-    
-    // Start cycling through loading messages
     let messageIndex = 0;
     const messageInterval = setInterval(() => {
       setLoadingMessage(loadingMessages[messageIndex % loadingMessages.length])
@@ -180,11 +125,7 @@ export function HoopBuddyForm() {
         improvement: formData.improvement,
         availableDays: selectedDays
       }
-      
-      // Set initial loading message
       setLoadingMessage(loadingMessages[0])
-      
-      // Make API call to your backend that will call Gemini API
       const response = await fetch('/api/generate-workout', {
         method: 'POST',
         headers: {
@@ -269,8 +210,6 @@ export function HoopBuddyForm() {
           <ResultStep 
             workoutPlan={workoutPlan} 
             workoutPlanRef={workoutPlanRef as React.RefObject<HTMLDivElement>} 
-            isGeneratingPDF={isGeneratingPDF} 
-            onGeneratePDF={generatePDF} 
           />
         )
       default:
