@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -14,6 +14,8 @@ import { Slider } from "@/components/ui/slider"
 import { ChevronLeft, ChevronRight, Download, Trophy, Loader2 } from "lucide-react"
 import { WorkoutPlan } from "@/components/workout-plan"
 import { positions, days, levels } from "@/lib/constants"
+import jsPDF from "jspdf"
+import html2canvas from "html2canvas"
 
 interface FormSchedule {
   [key: string]: {
@@ -76,6 +78,8 @@ export function HoopBuddyForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loadingMessage, setLoadingMessage] = useState<string>("")
+  const workoutPlanRef = useRef<HTMLDivElement>(null)
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
 
 
   const loadingMessages = [
@@ -131,6 +135,59 @@ export function HoopBuddyForm() {
   const handleBack = () => {
     if (step > 0) {
       setStep(step - 1)
+    }
+  }
+
+  const generatePDF = async () => {
+    if (!workoutPlanRef.current || !workoutPlan) return
+    
+    try {
+      setIsGeneratingPDF(true)
+      // Set a loading state if needed
+      const element = workoutPlanRef.current
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        logging: false,
+        useCORS: true,
+        allowTaint: true
+      })
+      
+      const imgData = canvas.toDataURL('image/png')
+      
+      // Initialize PDF
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      })
+      
+      const imgWidth = 210 // A4 width in mm
+      const pageHeight = 297 // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width
+      
+      let heightLeft = imgHeight
+      let position = 0
+      
+      // Add first page
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+      heightLeft -= pageHeight
+      
+      // Add subsequent pages if needed
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight
+        pdf.addPage()
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+        heightLeft -= pageHeight
+      }
+      
+      // Create a filename with the person's name
+      const fileName = `${workoutPlan.name.replace(/\s+/g, '_')}_basketball_workout_plan.pdf`
+      pdf.save(fileName)
+      
+    } catch (err) {
+      console.error('Error generating PDF:', err)
+    } finally {
+      setIsGeneratingPDF(false)
     }
   }
 
@@ -328,15 +385,19 @@ export function HoopBuddyForm() {
                       htmlFor={position.value}
                       className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white/70 backdrop-blur-sm p-4 hover:bg-orange-50 hover:border-orange-200 peer-data-[state=checked]:border-orange-500 peer-data-[state=checked]:bg-orange-50 w-full cursor-pointer"
                     >
-                      <div className="mb-3 rounded-full bg-orange-100 p-2">
+                      <div className="mb-3 rounded-full  p-2 flex items-center justify-center">
                         <img
-                          src={`/placeholder.svg?height=50&width=50`}
+                          src={`/${position.value === "pointGuard" ? "pg" : 
+                                 position.value === "shootingGuard" ? "sg" : 
+                                 position.value === "smallForward" ? "sf" : 
+                                 position.value === "powerForward" ? "pf" : 
+                                 position.value === "center" ? "c" : ""}.png`}
                           alt={position.label}
                           className="h-12 w-12 rounded-full object-cover"
                         />
                       </div>
-                      <div className="font-medium">{position.label}</div>
-                      <div className="text-xs text-muted-foreground">{position.description}</div>
+                      <div className="font-medium text-black">{position.label}</div>
+                      <div className="text-xs text-black">{position.description}</div>
                     </Label>
                   </div>
                 ))}
@@ -481,10 +542,26 @@ export function HoopBuddyForm() {
                 Based on your profile, we've created a custom basketball training program
               </CardDescription>
             </CardHeader>
-            <CardContent>{workoutPlan && <WorkoutPlan plan={workoutPlan} />}</CardContent>
+            <CardContent>
+              <div ref={workoutPlanRef}>
+                {workoutPlan && <WorkoutPlan plan={workoutPlan} />}
+              </div>
+            </CardContent>
             <CardFooter className="flex justify-center">
-              <Button className="bg-orange-500 hover:bg-orange-600">
-                <Download className="mr-2 h-4 w-4" /> Download PDF
+              <Button 
+                className="bg-orange-500 hover:bg-orange-600"
+                onClick={generatePDF}
+                disabled={isGeneratingPDF}
+              >
+                {isGeneratingPDF ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating PDF...
+                  </>
+                ) : (
+                  <>
+                    <Download className="mr-2 h-4 w-4" /> Download PDF
+                  </>
+                )}
               </Button>
             </CardFooter>
           </motion.div>
