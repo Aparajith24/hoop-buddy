@@ -40,7 +40,6 @@ export function HoopBuddyForm() {
   const [error, setError] = useState<string | null>(null)
   const [loadingMessage, setLoadingMessage] = useState<string>("")
   const workoutPlanRef = useRef<HTMLDivElement>(null)
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
 
   const loadingMessages = [
     "Analyzing your basketball superpower...",
@@ -126,7 +125,10 @@ export function HoopBuddyForm() {
         availableDays: selectedDays
       }
       setLoadingMessage(loadingMessages[0])
-      const response = await fetch('/api/generate-workout', {
+      
+      // Use the new Express backend API endpoint
+      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5050'
+      const response = await fetch(`${BACKEND_URL}/api/generate-workout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -135,7 +137,11 @@ export function HoopBuddyForm() {
       })
       
       if (!response.ok) {
-        throw new Error('Failed to generate workout plan')
+        const errorData = await response.json().catch(() => null);
+        throw new Error(
+          errorData?.error || errorData?.details || 
+          `Failed to generate workout plan: ${response.status} ${response.statusText}`
+        );
       }
       
       const data = await response.json()
