@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       ${availableDays.map((day: AvailableDay) => `- ${day.day.charAt(0).toUpperCase() + day.day.slice(1)}: ${day.hours} hours, Time: ${day.timeOfDay.join(', ')}`).join('\n')}
       
       For each day, create specific exercises with durations and descriptions. Describe the exercises in detail, including the equipment needed, the specific movements, and the target muscle groups.
-      
+      Specify each workout sperately with amount of repetitions and sets.
       Return your response as a properly formatted JSON object with the following structure:
       {
         "name": "${name}",
