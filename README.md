@@ -21,7 +21,7 @@ HoopBuddy is a personalized basketball workout assistant that generates custom t
 
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/hoopbuddy.git
+git clone https://github.com/Aparajith24/hoop-buddy.git
 cd hoopbuddy
 ```
 
