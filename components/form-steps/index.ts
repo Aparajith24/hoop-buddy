@@ -1,0 +1,8 @@
+export { PersonalInfoStep } from './personal-info'
+export { AgeStep } from './age-step'
+export { PositionStep } from './position-step'
+export { ScheduleStep } from './schedule-step'
+export { LevelStep } from './level-step'
+export { ImprovementStep } from './improvement-step'
+export { ResultStep } from './result-step'
+export { LoadingStep } from './loading-step' 
