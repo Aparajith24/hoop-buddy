@@ -23,7 +23,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           {children}
-          <Analytics mode="production" />;
+          <Analytics mode="production" />
         </ThemeProvider>
       </body>
     </html>
